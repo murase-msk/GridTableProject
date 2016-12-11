@@ -1,3 +1,10 @@
+
+/* jqGridでセル内改行させる */
+.ui-jqgrid tr.jqgrow td {
+  white-space: normal !important;
+  word-break: break-all !important;
+}
+
 .css_yellow{
     background: yellow !important;
     color:black !important;

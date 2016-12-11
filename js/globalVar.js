@@ -34,10 +34,10 @@ var g_colModel =[
     {name:'hinban', index:"hinban", width:100,fixed:true,editable:true, editrules:{integer:true}},
     {name:'Wlot', index:"Wlot", width:100,fixed:true,editable:true},
     {name:'Mlot', index:"Mlot", width:100,fixed:true,editable:true},
-    {name:'ijounaiyou', index:"ijounaiyou", width:100,fixed:true,editable:true},
+    {name:'ijounaiyou', index:"ijounaiyou", width:100,fixed:true,editable:true,edittype:"textarea",editoptions: {rows:10, cols: 10 }},
 
-    {name:'seigi_genin', index:"seigi_genin", width:100,fixed:true,editable:true},
-    {name:'seigi_comento', index:"seigi_comento", width:100,fixed:true,editable:true},
+    {name:'seigi_genin', index:"seigi_genin", width:100,fixed:true,editable:true,editoptions: {rows:10, cols: 10 }},
+    {name:'seigi_comento', index:"seigi_comento", width:100,fixed:true,editable:true,edittype:"textarea",editoptions: {rows:10, cols: 10 }},
     {name:'seigi_tantou1', index:"seigi_tantou1", width:100,fixed:true,editable:true},
     {name:'seigi_teisyutubi1', index:"seigi_teisyutubi1", width:100,fixed:true,editable:true, editoptions:g_datePicker},
     {name:'seigi_tantou2', index:"seigi_tantou2", width:100,fixed:true,editable:true},
