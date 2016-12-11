@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="jp">
+<head>
+<meta charset="utf-8" />
+<!--css読み込み-->
+<link type="text/css" media="screen" href="css/userCustom.css" rel="stylesheet" />
+<link rel="stylesheet" href="lib/jquery-ui-themes/themes/redmond/jquery-ui.css" />
+<link type="text/css" media="screen" href="css/ui.jqgrid.css" rel="stylesheet" />
+
+</head>
+<body>
+
+<label><input type="radio" name="hiddenColumn" value="all" checked>全表示</label>
+<label><input type="radio" name="hiddenColumn" value="seigi">生技</label>
+<label><input type="radio" name="hiddenColumn" value="hinkan">品管</label>
+<br>
+<select name="columnList" class="ui-selectmenu-button ui-button ui-widget ui-selectmenu-button-closed ui-corner-all"></select>
+<input type="text" class="word" name="word1" class="word1" size="10">
+<input type="text" class="word" name="word2"　class="word2" size="10" hidden>
+<select name="filterList" class="ui-selectmenu-button ui-button ui-widget ui-selectmenu-button-closed ui-corner-all">
+    <option value="equal">と一致</option>
+    <option value="contain">を含む</option>
+    <option value="equalBig">と等しいか大きい</option>
+    <option value="equalSmall">と等しいか小さい</option>
+    <option value="between">２つの間</option>
+</select>
+<button id= "searchRecord">検索</button>
+<button id= "resetFilter">リセット</button>
+<br>
+<button id="addNewRecord">追加</button>
+<button id="editSelectedRecord">編集</button>
+<button id="saveSelectedRecord">保存</button>
+<button id="deleteSelectedRecord">削除</button>
+
+<table id="list"></table>
+<div id="pager1"></div>
+
+<!--js読み込み-->
+<script type="text/javascript" src="lib/jqGrid-5.2.0/js/jquery-1.11.0.min.js"></script>
+<!--<script type="text/javascript" src="lib/jqGrid-5.2.0/js/jquery-3.1.1.min.js"></script>-->
+<script type="text/javascript"src="lib/jquery-ui-1.9.2.custom/js/jquery-ui-1.9.2.custom.min.js"></script>
+<script type="text/javascript"src="lib/jquery-ui-1.9.2.custom/js/jquery.ui.datepicker-ja.min.js"></script>
+<script type="text/javascript" src="lib/jqGrid-5.2.0/js/jquery.jqgrid.min.js"></script>
+<script type="text/javascript" src="lib/jqGrid-5.2.0/js/i18n/grid.locale-ja.js" ></script>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<script type="text/javascript" src="js/globalVar.js"></script>
+<script type="text/javascript" src="js/getData.js"></script>
+
+
+</body>
+</html>
+
+
+

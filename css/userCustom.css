@@ -1,0 +1,32 @@
+.css_yellow{
+    background: yellow !important;
+    color:black !important;
+}
+.css_pink{
+    background: pink !important;
+    color:black !important;
+}
+
+.test_id-header {
+    background: red !important;
+    color:green !important;
+}
+.test_multi-header {
+    background: pink !important;
+    color:red !important;
+}
+.test_name-header {
+    background: green !important;
+    color:pink !important;
+}
+.test_date-header {
+    background: blue !important;
+}
+.test_list-header {
+    background: yellow !important;
+}
+
+.ui-jqgrid .ui-jqgrid-labels th.ui-th-column {
+    background-color: none;
+    background-image: none
+}
