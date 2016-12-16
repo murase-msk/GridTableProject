@@ -1,5 +1,6 @@
 
 var grid = $("#list");
+var documentReadyTime = null;
 
 // 新規の行追加
 function addNewRecord(){
@@ -48,12 +49,15 @@ function saveSelectedRecord(){
     var saveparameters = {
         "successfunc" : null,
         "url" : "php/saveData.php",
-        "extraparam" : {type:"save"},
-        "aftersavefunc" : null,
-        "errorfunc": function(){
-            alert("保存失敗");
+        "extraparam" : {type:"save",open_time:documentReadyTime,last_edit:getDateFormat()},
+        "aftersavefunc" : function(){
+            location.reload();
         },
-        "afterrestorefunc" : null,
+        "errorfunc": function(){
+            alert("更新してから再度保存してください");
+        },
+        "afterrestorefunc" : function(){
+        },
         "restoreAfterError" : true,
         "mtype" : "POST"
     }
@@ -263,6 +267,21 @@ $(function(){
     // 2button／buttonsetメソッドでボタンに整形
     $('button').button();
     
+    documentReadyTime = ""+getDateFormat();
+    console.log(getDateFormat());
 });
 
 
+// 現在時刻日付を取得.
+function getDateFormat(){
+    var date=new Date(); 
+    //年・月・日・曜日を取得する
+    var year = date.getFullYear();
+    var month = date.getMonth()+1;
+    var day = date.getDate();
+    var hour = date.getHours();
+    var minute = date.getMinutes();
+    var second = date.getSeconds();
+    return ""+year+"-"+("0"+month).slice(-2)+"-"+("0"+day).slice(-2)+ " "+
+        ("0"+hour).slice(-2)+":"+("0"+minute).slice(-2)+":"+("0"+second).slice(-2)
+}

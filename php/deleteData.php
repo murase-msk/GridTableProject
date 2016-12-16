@@ -11,7 +11,7 @@ if($_POST["type"] == "delete") {
     	 $pdo = new PDO($g_dbname);
 		 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		 $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-	    $stmt = $pdo->prepare("delete FROM idnameTable where id = :id");
+	    $stmt = $pdo->prepare("delete FROM ".$g_tableName." where id = :id");
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
 	    $stmt->execute();
 	}catch (Exception $e){
