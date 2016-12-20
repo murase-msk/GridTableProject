@@ -21,6 +21,7 @@ function addNewRecord(){
 }
 
 //インライン編集.
+var lastSelection;
 function editSelectedRecord(){
     var id = grid.getGridParam("selrow");
     // http://www.trirand.com/jqgridwiki/doku.php?id=wiki:inline_editing
@@ -51,10 +52,11 @@ function saveSelectedRecord(){
         "url" : "php/saveData.php",
         "extraparam" : {type:"save",open_time:documentReadyTime,last_edit:getDateFormat()},
         "aftersavefunc" : function(){
-            location.reload();
+            // デバッグ時コメントアウト
+//            location.reload();
         },
         "errorfunc": function(){
-            alert("更新してから再度保存してください");
+            alert("他の人がデータを更新しました。更新してから変更内容を確認し、編集・保存をしてください");
         },
         "afterrestorefunc" : function(){
         },
@@ -132,7 +134,7 @@ $(function(){
         multiselect: false,  // 複数行選択.
 //        sortable:true,  // ドラックドロップでソート可能か?.
         pager : 'pager1', // ページング //footerのページャー要素のid
-        rowNum : 100,//一ページに表示する行数
+        rowNum : 10,//一ページに表示する行数
         height: $(window).height() * 0.6,//高さ
         width: $(window).width() * 0.9,//幅
         autowidth:false,     // 幅を自動で変えるか
@@ -146,11 +148,27 @@ $(function(){
         ondblClickRow: function(rowid) {
             editSelectedRecord(rowid);
         },
-        // 行を選択したときの処理.
+        //行を選択したときの処理.
         onSelectRow: function(id){
+            // 選択行と違う行を選択したとき.
             if (id && id!==lastSel){
-                grid.restoreRow(lastSel);
-                lastSel=id;
+                // 選択していた行が編集中であるか.
+                if($("#"+lastSel).attr("editable")==1){
+                    // ダイアログをモーダルウィンドウで表示.
+                    $( "#dialog" ).dialog({
+                　　　modal: true,
+                　　　buttons: {
+                　　　　"OK": function(){
+                　　　　$(this).dialog('close');
+                　　　　}
+                　　　}
+                　　});
+                    //選択行を変えない.
+                    grid.jqGrid("setSelection",lastSel);
+                }else{
+                    //grid.restoreRow(lastSel);
+                    lastSel=id;
+                }
             }
         },
         error:function(){
@@ -199,6 +217,17 @@ $(function(){
     $("#resetFilter").click(function(e){
         searchRecord({reset:true});
     });
+    $("#reloadGrid").click(function(e){
+        grid.trigger("reloadGrid");
+        documentReadyTime = ""+getDateFormat();
+    });
+    $("#restoreSelectedRecord").click(function(e){
+        var id = grid.getGridParam("selrow");
+        console.info(id);
+        grid.restoreRow(id);
+    });
+
+    
     /////////////////////////////////
     ////////////フィルター関係////////
     /////////////////////////////////
@@ -209,12 +238,17 @@ $(function(){
         $("[name='columnList']").append("<option value="+colModelList[i].name+">"+colNamesList[i]+"</option>");
     }
     // 検索行プルダウンのイベント.
+    // テキストボックスをdatepickerにするか.
     $("[name='columnList']").change(function(){
-        // テキストボックスをdatepickerにするか.
-        if($("[name='columnList'] option:selected").attr("value") == g_colNamesIndex[3]){
+        // プルダウンメニューのインデックスを取得.
+        var filteredObject = g_columnConfig.filter(function(item,index){
+            if(item.name === $("[name='columnList'] option:selected").attr("value")) return true;
+        });
+        // date型であるか.
+        if(filteredObject[0].typeOption && filteredObject[0].typeOption.additionalType && filteredObject[0].typeOption.additionalType ==="date"){
             $(".word").datepicker({dateFormat:'yy-mm-dd'});
         }else{
-            $(".word").datepicker( "option", "disabled", true );
+            $(".word").datepicker("destroy");
         }
     });
     // フィルターのプルダウン変更イベント.
@@ -228,6 +262,9 @@ $(function(){
     });
 
     // 列隠しラジオボタン切り替え.
+        //////
+        //////todo　g_colNamesIndexを使わないようにする
+        //////
     $('[name=hiddenColumn]:radio').change(function() {
         if ($("input[value='all']").prop('checked')) {
             var tmp = [];
@@ -267,8 +304,9 @@ $(function(){
     // 2button／buttonsetメソッドでボタンに整形
     $('button').button();
     
+    //ページを表示した時間を記録しておく.
     documentReadyTime = ""+getDateFormat();
-    console.log(getDateFormat());
+//    console.log(getDateFormat());
 });
 
 

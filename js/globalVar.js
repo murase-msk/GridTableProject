@@ -1,3 +1,4 @@
+// 日付用
 var g_datePicker ={
     size:20,
     dataInit:function(el){ 
@@ -12,15 +13,61 @@ var g_datePicker ={
         return year+"-"+month + "-"+day;
     }
 };
-var g_colNames = [
-    "ID",
-    "流動","管理No.","発行日","区分","No.","品番","Wlot","Mlot","異常内容",
 
-    "原因","コメント","担当","提出日","担当","提出日","期限","室長承認",
-    "受付日","担当","期限","可否","承認",
+var g_columnConfig=[];  // columnConfig.jsonと同じ.
+var g_colNames=[];      // 列の名前.
+//var g_colNamesIndex=[];
+var g_colModel = [];    // 列の設定.
+//　ajaxでデータベースの項目設定を取得する関数を返す（g_columnConfigの設定）
+function getColumnConfigAjax(){
+    var result = $.ajax({
+        type:"get",
+        url:"db/columnConfig.json",
+        dataType:"json",
+        async: false,
+        success:function(res){
+            g_columnConfig = res;
+        },
+        error:function(){
+            alert("ajax失敗");
+        }
+    });
+    return result;
+}
+// 色々設定（g_colNames,g_colModelの設定）.
+function colConfig(){
+//    console.info(g_columnConfig);
+    g_columnConfig.forEach(function(currentValue,index,array){
+        // colNamesの設定.
+        g_colNames.push(currentValue.yomi);
+        // colModelの設定.
+        // 共通の設定.
+//        console.info(currentValue.typeOption.additionalType);
+        var pushData = {name:currentValue.name, index:currentValue.name, width:100,fixed:true,editable:true};
+        if(currentValue.typeOption.additionalType==="date"){   // 日付.
+            pushData.editoptions = g_datePicker;
+        }else if(currentValue.typeOption.additionalType==="list"){ //リスト.
+            pushData.edittype='select';
+            pushData.editoptions={value:'ok:ok;ng:ng'};
+        }else if(currentValue.typeOption.additionalType==="textarea"){//テキストエリア.
+            pushData.edittype="textarea";
+            pushData.editoptions= {rows:10, cols: 10 };
+        }else if(currentValue.type === "int"){//Int.
+            pushData.editrules={integer:true};
+        }else if(currentValue.type === "string"){//String
+        }
+        // カラムを隠すか.
+        if(currentValue.isHidden === "true"){
+            pushData.hidden = true;
+        }
+        g_colModel.push(pushData);
+    });
+};
 
-    "last_edit"
-    ];
+getColumnConfigAjax()
+colConfig();
+
+//あとで削除する.
 var g_colNamesIndex = [
     "id",
     "ryuudou","kanriNo","hakkoubi","kubun","ijo_No","hinban","Wlot","Mlot","ijounaiyou",
@@ -28,33 +75,3 @@ var g_colNamesIndex = [
     "hinkan_uketukebi","hinkan_tantou","hinkan_kigen","hinkan_kahi","hinkan_syounin",
     "last_edit"
 ]
-var g_colModel =[
-    {name:g_colNamesIndex[0], index:g_colNamesIndex[0], hidden: true},
-
-    {name:g_colNamesIndex[1], index:g_colNamesIndex[1], width:100,fixed:true,editable:true, edittype:'select' , editoptions:{value:'ok:ok;ng:ng'}},
-    {name:g_colNamesIndex[2], index:g_colNamesIndex[2], width:100,fixed:true,editable:true, editrules:{integer:true}},
-    {name:g_colNamesIndex[3], index:g_colNamesIndex[3], width:100,fixed:true,editable:true, editoptions:g_datePicker},
-    {name:g_colNamesIndex[4], index:g_colNamesIndex[4], width:100,fixed:true,editable:true},
-    {name:g_colNamesIndex[5], index:g_colNamesIndex[5], width:100,fixed:true,editable:true, editrules:{integer:true}},
-    {name:g_colNamesIndex[6], index:g_colNamesIndex[6], width:100,fixed:true,editable:true, editrules:{integer:true}},
-    {name:g_colNamesIndex[7], index:g_colNamesIndex[7], width:100,fixed:true,editable:true},
-    {name:g_colNamesIndex[8], index:g_colNamesIndex[8], width:100,fixed:true,editable:true},
-    {name:g_colNamesIndex[9], index:g_colNamesIndex[9], width:100,fixed:true,editable:true,edittype:"textarea",editoptions: {rows:10, cols: 10 }},
-
-    {name:g_colNamesIndex[10], index:g_colNamesIndex[10], width:100,fixed:true,editable:true,editoptions: {rows:10, cols: 10 }},
-    {name:g_colNamesIndex[11], index:g_colNamesIndex[11], width:100,fixed:true,editable:true,edittype:"textarea",editoptions: {rows:10, cols: 10 }},
-    {name:g_colNamesIndex[12], index:g_colNamesIndex[12], width:100,fixed:true,editable:true},
-    {name:g_colNamesIndex[13], index:g_colNamesIndex[13], width:100,fixed:true,editable:true, editoptions:g_datePicker},
-    {name:g_colNamesIndex[14], index:g_colNamesIndex[14], width:100,fixed:true,editable:true},
-    {name:g_colNamesIndex[15], index:g_colNamesIndex[15], width:100,fixed:true,editable:true, editoptions:g_datePicker},
-    {name:g_colNamesIndex[16], index:g_colNamesIndex[16], width:100,fixed:true,editable:true, editoptions:g_datePicker},
-    {name:g_colNamesIndex[17], index:g_colNamesIndex[17], width:100,fixed:true,editable:true},
-
-    {name:g_colNamesIndex[18], index:g_colNamesIndex[18], width:100,fixed:true,editable:true, editoptions:g_datePicker},
-    {name:g_colNamesIndex[19], index:g_colNamesIndex[19], width:100,fixed:true,editable:true},
-    {name:g_colNamesIndex[20], index:g_colNamesIndex[20], width:100,fixed:true,editable:true, editoptions:g_datePicker},
-    {name:g_colNamesIndex[21], index:g_colNamesIndex[21], width:100,fixed:true,editable:true, edittype:'select' , editoptions:{value:'ok:ok;ng:ng'}},
-    {name:g_colNamesIndex[22], index:g_colNamesIndex[22], width:100,fixed:true,editable:true},
-
-    {name:g_colNamesIndex[23], index:g_colNamesIndex[23], hidden: true},
-];

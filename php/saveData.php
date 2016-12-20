@@ -20,7 +20,7 @@ if($_POST["oper"] == "edit") {
     //     header('HTTP/1.1 500 Internal Server Error');
     //     return;
     // }
-
+	$config = json_decode("../db/columnConfig.json",true);
   	try {
 		  // すでにあるデータであればアップデート、そうでなければインサート. 
 		// 接続
@@ -33,13 +33,13 @@ if($_POST["oper"] == "edit") {
 	    $r1 = $stmt->fetchAll();
 		if($r1[0]['count'] == 1){
 			if(isUpdate($columnList)){
-				updateNewRecord($columnList);
+				updateRecord($columnList,$config);
 			}else{
 				// サーバーエラーを返す.
 				header('HTTP/1.1 500 Internal Server Error');
 			}
 		}else{
-			saveNewRecord($columnList);
+			saveNewRecord($columnList,$config);
 		}
 	}catch (Exception $e){
         debug_print_backtrace();
@@ -50,10 +50,10 @@ if($_POST["oper"] == "edit") {
 
 }
 
+// 楽観的排他制御　画面を表示してから他の人が更新した時は更新できない.
 function isUpdate($columnList){
-	ChromePhp::log("isUpdate");
+//	ChromePhp::log("isUpdate");
 	include 'global.php';
-	// 楽観的排他制御　画面を表示してから他の人が更新した時は更新できない.
 		try {
 		// 接続
 		$pdo = new PDO($g_dbname);
@@ -65,11 +65,11 @@ function isUpdate($columnList){
 	    $stmt->execute();
 		foreach ($stmt as $row) {
 			$count = $row["count"];
-			ChromePhp::log($count);	
+//			ChromePhp::log($count);	
 		}
 
-		ChromePhp::log($columnList["open_time"]);
-		var_dump($columnList);
+//		ChromePhp::log($columnList["open_time"]);
+//		var_dump($columnList);
 //		$sqlDump = $stmt->debugDumpParams();
 //		ChromePhp::log($sqlDump);
 	}catch (Exception $e){
@@ -84,14 +84,15 @@ function isUpdate($columnList){
 }
 
 //データの更新.
-function updateNewRecord($columnList){
+function updateRecord($columnList, $config){
 	// SQL文作成.
 	include 'global.php';
+	var_dump($config);
 	$string = "";
 	$string .= "update ".$g_tableName." set ";
-	foreach($g_columnList as $key => $value){
-		if($value === "id") continue;
-		$string .= "".$value."=:".$value.",";
+	foreach($config as $key => $value){
+		if($config[$key]["name"] === "id") continue;
+		$string .= "".$config[$key]["name"]."=:".$config[$key]["name"].",";
 	}
 	$string = rtrim($string, ',');
 	echo $string;
@@ -102,14 +103,14 @@ function updateNewRecord($columnList){
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		$pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 	    $stmt = $pdo->prepare($string." where id= :id");
-		foreach($g_columnList2 as $key => $value){
+		foreach($config as $key => $value){
 			$param = null;
-			if($value === "int"){
+			if($config[$key]["type"] === "int"){
 				$param = PDO::PARAM_INT;
 			}else{
 				$param = PDO::PARAM_STR;
 			}
-			$stmt->bindParam(':'.$key, $columnList[$key], $param);
+			$stmt->bindParam(':'.$config[$key]["name"], $columnList[$config[$key]["name"]], $param);
 		}
 
 	    $stmt->execute();
@@ -123,20 +124,20 @@ function updateNewRecord($columnList){
 }
 
 //新しいデータの保存
-function saveNewRecord($columnList){
+function saveNewRecord($columnList, $config){
 	// SQL文作成.
 	include 'global.php';
 	$string = "";
 	$string .= "insert into ".$g_tableName." ( ";
-	foreach($g_columnList as $key => $value){
-		if($value === "id") continue;
-		$string .= "".$value.",";
+	foreach($config as $key => $value){
+		if($config[$key]["name"] === "id") continue;
+		$string .= "".$config[$key]["name"].",";
 	}
 	$string = rtrim($string, ',');
 	$string .=") values(";
-	foreach($g_columnList as $key => $value){
-		if($value === "id") continue;
-		$string .= ":".$value.",";
+	foreach($config as $key => $value){
+		if($config[$key]["name"] === "id") continue;
+		$string .= ":".$config[$key]["name"].",";
 	}
 	$string = rtrim($string, ',');
 	$string .=")";
@@ -146,15 +147,15 @@ function saveNewRecord($columnList){
 		 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		 $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 	    $stmt = $pdo->prepare($string);
-		foreach($g_columnList2 as $key => $value){
-			if($key === "id") continue;
+		foreach($config as $key => $value){
+			if($config[$key]["name"] === "id") continue;
 			$param = null;
-			if($value === "int"){
+			if($config[$key]["type"] === "int"){
 				$param = PDO::PARAM_INT;
 			}else{
 				$param = PDO::PARAM_STR;
 			}
-			$stmt->bindParam(':'.$key, $columnList[$key], $param);
+			$stmt->bindParam(':'.$config[$key]["name"], $columnList[$config[$key]["name"]], $param);
 		}
 
 	    $stmt->execute();
