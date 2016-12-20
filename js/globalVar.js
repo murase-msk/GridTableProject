@@ -48,7 +48,10 @@ function colConfig(){
             pushData.editoptions = g_datePicker;
         }else if(currentValue.typeOption.additionalType==="list"){ //リスト.
             pushData.edittype='select';
-            pushData.editoptions={value:'ok:ok;ng:ng'};
+            ////////////////
+            // todo　リストの内容が反映されるように修正する.
+            ////////////////
+            pushData.editoptions={value:':;ok:ok;ng:ng'};
         }else if(currentValue.typeOption.additionalType==="textarea"){//テキストエリア.
             pushData.edittype="textarea";
             pushData.editoptions= {rows:10, cols: 10 };

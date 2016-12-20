@@ -15,12 +15,11 @@ if($_POST["oper"] == "edit") {
 	unset($columnList["type"]);
 	unset($columnList["oper"]);
 	
-	// // バリデーション.
-    // if(!is_numeric($test_id)){
-    //     header('HTTP/1.1 500 Internal Server Error');
-    //     return;
-    // }
-	$config = json_decode("../db/columnConfig.json",true);
+	// jsonデータを読み込む.
+	$json = file_get_contents("../db/columnConfig.json");
+	$json = mb_convert_encoding($json, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN');
+	$config = json_decode($json,true);
+//	var_dump($config);
   	try {
 		  // すでにあるデータであればアップデート、そうでなければインサート. 
 		// 接続

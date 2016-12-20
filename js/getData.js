@@ -135,6 +135,7 @@ $(function(){
 //        sortable:true,  // ドラックドロップでソート可能か?.
         pager : 'pager1', // ページング //footerのページャー要素のid
         rowNum : 10,//一ページに表示する行数
+        loadonce: true,//一度にデータを読み込む.
         height: $(window).height() * 0.6,//高さ
         width: $(window).width() * 0.9,//幅
         autowidth:false,     // 幅を自動で変えるか
