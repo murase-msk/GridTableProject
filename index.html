@@ -6,7 +6,7 @@
 <link type="text/css" media="screen" href="css/userCustom.css" rel="stylesheet" />
 <link rel="stylesheet" href="lib/jquery-ui-themes/themes/redmond/jquery-ui.css" />
 <link type="text/css" media="screen" href="css/ui.jqgrid.css" rel="stylesheet" />
-
+<link rel="stylesheet" href="css/mycss.css" />
 </head>
 <body>
 
@@ -36,9 +36,16 @@
 
 <table id="list"></table>
 <div id="pager1"></div>
+<button id="first_page">最初</button>
+<button id="pre_page">←</button>
+<input type="text" id="now_page" name="page" value="1" size="5" style="height:20px;text-align:center;"> 
+<span>ページ目</span>
+<span>　　</span>
+<span id="total_data">xx</span>件中<span id="front_data">xx</span>-<span id="rear_data">xx</span>を表示
+<button id="next_page">→</button>
+<button id="last_page">最後</button>
 
-
-<div id="dialog">編集内容を「保存」するか「取りやめ」してください</div>
+<div hidden id="dialog">編集内容を「保存」するか「取りやめ」してください</div>
 
 <!--js読み込み-->
 <script type="text/javascript" src="lib/jqGrid-5.2.0/js/jquery-1.11.0.min.js"></script>
@@ -51,6 +58,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <script type="text/javascript" src="js/globalVar.js"></script>
+<script type="text/javascript" src="js/Event.js"></script>
 <script type="text/javascript" src="js/getData.js"></script>
 
 

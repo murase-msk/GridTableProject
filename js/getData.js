@@ -1,122 +1,14 @@
+/*eslint no-console: 1*/
+/* global g_colNamesIndex, */
 
-var grid = $("#list");
-var documentReadyTime = null;
+"use strict";
 
-// 新規の行追加
-function addNewRecord(){
-    var addparameters ={
-//        rowID : "new_row",
-        initdata : {},
-        position :"first",
-        useDefValues : false,
-        useFormatter : false,
-        addRowParams : {extraparam:{}}
-    }
-    var rtn = grid.jqGrid("addRow",addparameters);
-    //var rtn = grid.addRowData(undefined,addparameters);
-    // if( rtn )
-    //     alert("追加成功");
-    // else
-    //     alert("追加失敗");
-}
-
-//インライン編集.
-var lastSelection;
-function editSelectedRecord(){
-    var id = grid.getGridParam("selrow");
-    // http://www.trirand.com/jqgridwiki/doku.php?id=wiki:inline_editing
-    // editRow(rowid, keys, oneditfunc, successfunc, url, extraparam, aftersavefunc,errorfunc, afterrestorefunc);
-    // rowid: 編集している行
-    // keys: Enterで保存　ESCでキャンセルできる
-    // oneditfunc.
-    var editparameters = {
-        "keys" : false,
-        "oneditfunc" : null,
-        "successfunc" : null,
-        "url" : null,
-        "extraparam" : {},
-        "aftersavefunc" : null,
-        "errorfunc": null,
-        "afterrestorefunc" : null,
-        "restoreAfterError" : true,
-        "mtype" : "POST"
-    }
-    grid.editRow(id, editparameters);
-}
-
-// 保存.
-function saveSelectedRecord(){
-    var id = grid.getGridParam("selrow");
-    var saveparameters = {
-        "successfunc" : null,
-        "url" : "php/saveData.php",
-        "extraparam" : {type:"save",open_time:documentReadyTime,last_edit:getDateFormat()},
-        "aftersavefunc" : function(){
-            // デバッグ時コメントアウト
-//            location.reload();
-        },
-        "errorfunc": function(){
-            alert("他の人がデータを更新しました。更新してから変更内容を確認し、編集・保存をしてください");
-        },
-        "afterrestorefunc" : function(){
-        },
-        "restoreAfterError" : true,
-        "mtype" : "POST"
-    }
-    grid.saveRow(id, saveparameters);
-}
-
-// 選択行の削除.
-function deleteSelectedRecord(){
-    var id = grid.getGridParam("selrow");
-    if(id){
-        var deleteData = grid.getRowData(id);
-        deleteData.type = "delete";
-        console.log(grid.getRowData(id));
-        $.ajax({
-            // ajax設定
-            type: 'POST',
-            scriptCharset: 'utf-8',
-            url: "php/deleteData.php",
-            data:deleteData,
-            success: function(res){
-                var rtn = grid.delRowData(id);
-                if(rtn){
-                    alert("削除成功");
-                }else{
-                    alert("削除失敗");
-                }
-            },
-            error: function(){
-                alert("削除失敗");
-            }
-        });
-    }
-    else{
-        alert("選択されてません");
-    }
-}
-
-// 指定のワードを検索.
-function searchRecord(option){
-    // リセットかどうか.
-    if(option != undefined && option.reset == true){
-        grid.jqGrid("setGridParam",{url:"php/getDataFromDB.php?option=aaa"}).trigger("reloadGrid");
-        return;
-    }
-    // どの行について検索するか.
-    var searchColumn = $("[name='columnList']").val();
-    // 検索方法.
-    var searchType = $("[name='filterList']").val();
-    var word1 = $("[name='word1']").val();
-    var word2 = $("[name='word2']").val();
-    var option = "columnList="+searchColumn+"&filterList="+searchType+"&word1="+word1+"&word2="+word2+""
-    grid.jqGrid("setGridParam",{url:"php/getDataFromDB.php?option=search&"+option+""}).trigger("reloadGrid");
-}
-
-//
-var resultData={}
+//Main Function
 $(function(){
+    var grid = $("#list");
+    var event = new Event(grid);
+    event.addListener();
+
     var lastSel;
     ////////////////////////////////////
     /////////////jqGrid/////////////////
@@ -126,28 +18,59 @@ $(function(){
         url: "php/getDataFromDB.php?option=aaa",
 //        editurl: "php/phpsv.php",
 //                data: resultData,
-        datatype: "json",//データの種別
-        colNames:g_colNames,//列の表示名
+        //データの種別
+        datatype: "json",
+        //列の表示名
+        colNames:g_colNames,
         // バリデーション.
         //http://www.trirand.com/jqgridwiki/doku.php?id=wiki%3acommon_rules#editrules
-        colModel:g_colModel,//列ごとの設定
-        multiselect: false,  // 複数行選択.
+        //列ごとの設定
+        colModel:g_colModel,
+        // 複数行選択.
+        multiselect: false, 
 //        sortable:true,  // ドラックドロップでソート可能か?.
-        pager : 'pager1', // ページング //footerのページャー要素のid
-        rowNum : 10,//一ページに表示する行数
-        loadonce: true,//一度にデータを読み込む.
-        height: $(window).height() * 0.6,//高さ
-        width: $(window).width() * 0.9,//幅
-        autowidth:false,     // 幅を自動で変えるか
-        shrinkToFit:false,  // 自動で小さくするか
+        // ページング //footerのページャー要素のid
+        pager : 'pager1', 
+        // onPaging:function(pgButton){
+        //     console.log(pgButton);
+        // },
+        //一ページに表示する行数
+        rowNum : 20,
+        //一度にデータを読み込む.
+        loadonce: false,
+        //高さ
+        height: $(window).height() * 0.6,
+        //幅
+        width: $(window).width() * 0.9,
+        // 幅を自動で変えるか
+        autowidth:false,
+        // キャプション.
         caption: 'テスト表示',
-        shrinkToFit : true,       //画面サイズに依存せず固定の大きさを表示する設定
-        viewrecords: true,             //footerの右下に表示する。
-        regional : 'ja2',               //日本語
-        gridview: true, // treeGrid,subGrid,afterInsertRowを使わないならtrueをセットして高速化する.
+        //画面サイズに依存せず固定の大きさを表示する設定
+        shrinkToFit : true,
+         //footerの右下に表示する。
+        viewrecords: true,
+        //リージョン 日本語
+        regional : 'ja2',
+        // treeGrid,subGrid,afterInsertRowを使わないならtrueをセットして高速化する.
+        gridview: true, 
+        // Webサーバからデータを取得.
+        jsonReader: {
+            id: "Id",
+            root: function (obj) { return obj; },
+            page: function (obj) { return obj; },
+            total: function (obj) { return obj; },
+            records: function (obj) { return obj.length; },
+            sort: function (obj) {return obj;},
+            repeatitems: false,
+        },
+//    pgbuttons : false,
+//    viewrecords : false,
+//    pgtext : "",
+//    pginput : false,
         // 行をダブルクリックしたときの処理.
         ondblClickRow: function(rowid) {
-            editSelectedRecord(rowid);
+            event.editSelectedRecord(rowid);
         },
         //行を選択したときの処理.
         onSelectRow: function(id){
@@ -157,13 +80,13 @@ $(function(){
                 if($("#"+lastSel).attr("editable")==1){
                     // ダイアログをモーダルウィンドウで表示.
                     $( "#dialog" ).dialog({
-                　　　modal: true,
-                　　　buttons: {
-                　　　　"OK": function(){
-                　　　　$(this).dialog('close');
-                　　　　}
-                　　　}
-                　　});
+                        modal: true,
+                        buttons: {
+                           "OK": function(){
+                                $(this).dialog('close');
+                            }
+                        }
+                    });
                     //選択行を変えない.
                     grid.jqGrid("setSelection",lastSel);
                 }else{
@@ -184,10 +107,6 @@ $(function(){
             {startColumnName:'hinkan_uketukebi', numberOfColumns:5, titleText:"品管"}
         ]
     });
-    // // フィルター.
-    // var options = {};
-    // grid.jqGrid('filterToolbar',options);
-
     // 特定の列にタグをつける(ヘッダの色を変える).
     // grid.jqGrid("setLabel", 1, false, "test_id-header");
     // grid.jqGrid("setLabel", 2, false, "test_multi-header");
@@ -198,35 +117,6 @@ $(function(){
     grid.jqGrid("setLabel", 10, false, "css_yellow");
     grid.jqGrid("setLabel", 11, false, "css_pink");
 
-
-    // ボタンイベント処理
-    $("#addNewRecord").click(function(e){
-        addNewRecord();
-    });
-    $("#editSelectedRecord").click(function(e){
-        editSelectedRecord();
-    });
-    $("#saveSelectedRecord").click(function(e){
-       saveSelectedRecord()
-    });
-    $("#deleteSelectedRecord").click(function(e){
-       deleteSelectedRecord()
-    });
-    $("#searchRecord").click(function(e){
-        searchRecord();
-    });
-    $("#resetFilter").click(function(e){
-        searchRecord({reset:true});
-    });
-    $("#reloadGrid").click(function(e){
-        grid.trigger("reloadGrid");
-        documentReadyTime = ""+getDateFormat();
-    });
-    $("#restoreSelectedRecord").click(function(e){
-        var id = grid.getGridParam("selrow");
-        console.info(id);
-        grid.restoreRow(id);
-    });
 
     
     /////////////////////////////////
@@ -264,7 +154,7 @@ $(function(){
 
     // 列隠しラジオボタン切り替え.
         //////
-        //////todo　g_colNamesIndexを使わないようにする
+        //////todo: g_colNamesIndexを使わないようにする
         //////
     $('[name=hiddenColumn]:radio').change(function() {
         if ($("input[value='all']").prop('checked')) {
@@ -301,26 +191,17 @@ $(function(){
             .setGridHeight($(window).height() * 0.6);
     }).trigger('resize');
 
+
+    event.updatePager();
+    
     //デザイン
     // 2button／buttonsetメソッドでボタンに整形
     $('button').button();
     
     //ページを表示した時間を記録しておく.
-    documentReadyTime = ""+getDateFormat();
+    event.documentReadyTime = ""+event.getDateFormat();
 //    console.log(getDateFormat());
 });
 
 
-// 現在時刻日付を取得.
-function getDateFormat(){
-    var date=new Date(); 
-    //年・月・日・曜日を取得する
-    var year = date.getFullYear();
-    var month = date.getMonth()+1;
-    var day = date.getDate();
-    var hour = date.getHours();
-    var minute = date.getMinutes();
-    var second = date.getSeconds();
-    return ""+year+"-"+("0"+month).slice(-2)+"-"+("0"+day).slice(-2)+ " "+
-        ("0"+hour).slice(-2)+":"+("0"+minute).slice(-2)+":"+("0"+second).slice(-2)
-}
+

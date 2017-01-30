@@ -13,12 +13,24 @@ var g_datePicker ={
         return year+"-"+month + "-"+day;
     }
 };
+var g_totalDataNum;// 全データ数.
+    $.ajax({
+        // ajax設定
+        async:false,
+        type: 'GET',
+        scriptCharset: 'utf-8',
+        url: "php/getDataFromDB.php?option=totalData",
+        success: function(res){
+            g_totalDataNum = res;
+
+        }
+    });
 
 var g_columnConfig=[];  // columnConfig.jsonと同じ.
 var g_colNames=[];      // 列の名前.
 //var g_colNamesIndex=[];
 var g_colModel = [];    // 列の設定.
-//　ajaxでデータベースの項目設定を取得する関数を返す（g_columnConfigの設定）
+// ajaxでデータベースの項目設定を取得する関数を返す（g_columnConfigの設定）
 function getColumnConfigAjax(){
     var result = $.ajax({
         type:"get",
@@ -67,7 +79,7 @@ function colConfig(){
     });
 };
 
-getColumnConfigAjax()
+getColumnConfigAjax();
 colConfig();
 
 //あとで削除する.

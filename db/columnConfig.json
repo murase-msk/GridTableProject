@@ -5,7 +5,7 @@
         "yomi":"ID",
         "type":"string",
         "typeOption":"",
-        "isHidden":"true",
+        "isHidden":"false",
         "parentClass":""
     },
     {
@@ -212,7 +212,7 @@
         "yomi":"最終書き込み日",
         "type":"string",
         "typeOption":"",
-        "isHidden":"true",
+        "isHidden":"false",
         "parentClass":""
     }
 ]
