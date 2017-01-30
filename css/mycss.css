@@ -1,0 +1,13 @@
+@font-face {
+	font-family: 'VL_Gothi';
+	src: url('../font/VL-Gothic-Regular.ttf');
+}
+@font-face {
+	font-family: 'migu-2m-regular';
+	src: url('../font/migu-2m-regular.ttf');
+}
+
+* {
+	/*@font-faceで指定したフォントファミリー*/
+	font-family: 'migu-2m-regular';
+}
