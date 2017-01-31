@@ -13,18 +13,6 @@ var g_datePicker ={
         return year+"-"+month + "-"+day;
     }
 };
-var g_totalDataNum;// 全データ数.
-    $.ajax({
-        // ajax設定
-        async:false,
-        type: 'GET',
-        scriptCharset: 'utf-8',
-        url: "php/getDataFromDB.php?option=totalData",
-        success: function(res){
-            g_totalDataNum = res;
-
-        }
-    });
 
 var g_columnConfig=[];  // columnConfig.jsonと同じ.
 var g_colNames=[];      // 列の名前.

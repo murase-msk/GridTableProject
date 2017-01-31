@@ -99,6 +99,7 @@ $(function(){
             console.log('取得に失敗しました。');
         }
     });
+
     //マルチコラム
     grid.jqGrid("setGroupHeaders",{
         useColSpanStyle:true,

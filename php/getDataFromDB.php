@@ -12,7 +12,11 @@ if($_GET["option"] == "aaa"){
 	getAllData($_GET["option"], $_GET["sidx"], $_GET["sord"],$_GET["page"], $_GET["rows"],
 	$_GET["columnList"], $_GET["filterList"], $_GET["word1"], $_GET["word2"]);
 }elseif($_GET["option"] == "totalData"){
-	getTotalData();
+	if($_GET["option2"] == "search"){
+		getTotalData($_GET["option2"], $_GET["columnList"], $_GET["filterList"], $_GET["word1"], $_GET["word2"]);
+	}elseif($_GET["option2"] == "aaa"){
+		getTotalData($_GET["option2"]);
+	}
 }else{
 	echo "リクエストパラメータがおかしいです";
 }
@@ -44,6 +48,33 @@ $filterColumn=null, $filterType=null, $word1=null, $word2=null){
 		$sortSQL = " order by id desc ";
 	}
 	// フィルタをするときのSQL文.
+	$filterSQL = getFilterQuery($option, $filterColumn, $filterType, $word1, $word2);
+	try {
+		// 接続
+	    $pdo = new PDO($g_dbname);
+	    // SQL実行時にもエラーの代わりに例外を投げるように設定
+	    // (毎回if文を書く必要がなくなる)
+	    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	    // デフォルトのフェッチモードを連想配列形式に設定 
+	    // (毎回PDO::FETCH_ASSOCを指定する必要が無くなる)
+	    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+		// 選択 (プリペアドステートメント)
+//		ChromePhp::log("SELECT * FROM ".$g_tableName." ".$filterSQL." ".$sortSQL." ".$offsetSQL);
+	    $stmt = $pdo->prepare("SELECT * FROM ".$g_tableName." ".$filterSQL." ".$sortSQL." ".$offsetSQL);
+	    $stmt->execute();
+	    $r1 = $stmt->fetchAll();
+	    //結果の出力
+//	    header('Content-type: application/json');
+		header("Content-Type: text/javascript; charset=utf-8");
+		echo json_encode($r1);
+//	    ChromePhp::log(json_encode($r1));
+	} catch (Exception $e){
+		echo $e->getMessage() . PHP_EOL;
+	}
+}
+
+// 検索時のフィルター文の取得.
+function getFilterQuery($option, $filterColumn, $filterType, $word1, $word2){
 	$filterSQL = " ";
 	if($option == "search"){
 		$filterSQL .=" where ";
@@ -72,39 +103,19 @@ $filterColumn=null, $filterType=null, $word1=null, $word2=null){
 			break;
 		}
 	}
-	try {
-		// 接続
-	    $pdo = new PDO($g_dbname);
-	    // SQL実行時にもエラーの代わりに例外を投げるように設定
-	    // (毎回if文を書く必要がなくなる)
-	    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	    // デフォルトのフェッチモードを連想配列形式に設定 
-	    // (毎回PDO::FETCH_ASSOCを指定する必要が無くなる)
-	    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-		// 選択 (プリペアドステートメント)
-//		ChromePhp::log("SELECT * FROM ".$g_tableName." ".$filterSQL." ".$sortSQL." ".$offsetSQL);
-	    $stmt = $pdo->prepare("SELECT * FROM ".$g_tableName." ".$filterSQL." ".$sortSQL." ".$offsetSQL);
-	    $stmt->execute();
-	    $r1 = $stmt->fetchAll();
-	    //結果の出力
-//	    header('Content-type: application/json');
-		header("Content-Type: text/javascript; charset=utf-8");
-		echo json_encode($r1);
-//	    ChromePhp::log(json_encode($r1));
-	} catch (Exception $e){
-		echo $e->getMessage() . PHP_EOL;
-	}
+	return $filterSQL;
 }
 
 // データ数を取得.
-function getTotalData(){
+function getTotalData($option, $filterColumn=null, $filterType=null, $word1=null, $word2=null){
 include './global.php';
+$filterSQL = getFilterQuery($option, $filterColumn, $filterType, $word1, $word2);
 try {
 		// 接続
 	    $pdo = new PDO($g_dbname);
 	    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-	    $stmt = $pdo->prepare("SELECT count(*) as count FROM ".$g_tableName." ");
+	    $stmt = $pdo->prepare("SELECT count(*) as count FROM ".$g_tableName." ".$filterSQL);
 	    $stmt->execute();
 	    $r1 = $stmt->fetch();
 		header("Content-Type: text/javascript; charset=utf-8");
