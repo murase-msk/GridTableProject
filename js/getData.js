@@ -64,10 +64,11 @@ $(function(){
             sort: function (obj) {return obj;},
             repeatitems: false,
         },
-//    pgbuttons : false,
-//    viewrecords : false,
-//    pgtext : "",
-//    pginput : false,
+        // ページャー部分の非表示.
+        pgbuttons : false,
+        viewrecords : false,
+        pgtext : "",
+        pginput : false,
         // 行をダブルクリックしたときの処理.
         ondblClickRow: function(rowid) {
             event.editSelectedRecord(rowid);
